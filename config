@@ -1,0 +1,33 @@
+===============
+ User Settings
+===============
+protocols: ./protocols
+firewall-filter: ./filters/firewall
+logging-filter: ./filters/logger
+repo-filter: ./filters/replacer
+
+==================
+ Routing Settings
+==================
+broadcastInterface: wlan0
+ssid: testgateway
+nmode: infrastructure
+wpa: off
+password: pass
+
+===================
+ Firewall Settings
+===================
+firewall: off
+
+==================
+ Logging Settings
+==================
+logging: off
+smartlookup: off
+
+=====================
+ Payload Replacement
+=====================
+payloadreplacement: off
+
