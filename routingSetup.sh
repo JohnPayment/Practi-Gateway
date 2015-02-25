@@ -1,3 +1,4 @@
+#!/bin/sh
 # $1 - internal interface
 # $2 - internal ip
 # $3 - external interface
@@ -23,9 +24,9 @@ printf "dnsmasq is used for assigning IP addresses to clients and must be instal
 exit 1
 fi
 
-gate = route -n | grep \"$3\" | grep 'UG[ \t]' | awk '{print $2}' | awk '{split($1,array,"\n")} END{print array[1]}'
-range = route -n | grep "em1" | grep 'UG[ \t]' | awk '{print $2}' | awk '{split($1,array,"\n")} END{print array[1]}' | awk '{split($1,array,".")} END{print array[1]"."array[2]"."array[3]".0"}'
-access = $1 | awk '{split($1,array,".")} END{print array[1]"."array[2]"."array[3]".1"}'
+gate=$(route -n | grep "$3" | grep 'UG[ \\t]' | awk '{print $2 }' | awk '{split($1,array,"\n")} END{print array[1]}')
+range=$(echo $gate | awk -F"." '{print $1}')"."$(echo $gate | awk -F"." '{print $2}')"."$(echo $gate | awk -F"." '{print $3}')".0"
+access=$(echo $2 | awk -F"." '{print $1}')"."$(echo $2 | awk -F"." '{print $2}')"."$(echo $2 | awk -F"." '{print $3}')".1"
 
 ifconfig $1 up $access netmask 255.255.255.0
 sleep 2

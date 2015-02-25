@@ -13,7 +13,9 @@ broadcastInterface: wlan0
 ssid: testgateway
 nmode: infrastructure
 wpa: off
-password: pass
+password: password
+
+inter-ip: 192.168.10.0
 
 ===================
  Firewall Settings
