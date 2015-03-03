@@ -8,7 +8,7 @@ CFLAGS  = -g -Wall
 default: gateway
 
 gateway: gateway.o routing.o config.o
-	$(CC) $(CFLAGS) Gateway.o Routing.o Config.o -o practiGateway.exe
+	$(CC) $(CFLAGS) Gateway.o Routing.o Config.o -o ../practiGateway.exe
 
 gateway.o: Gateway.cpp Config.h 
 	$(CC) $(CFLAGS) -c Gateway.cpp
