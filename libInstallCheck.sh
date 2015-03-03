@@ -23,24 +23,3 @@ printf "You do not appear to have dnsmasq installed.\n"
 printf "dnsmasq is used for assigning IP addresses to clients and must be installed for the access point to function.\n"
 exit 1
 fi
-
-gate=$(route -n | grep "$3" | grep 'UG[ \\t]' | awk '{print $2 }' | awk '{split($1,array,"\n")} END{print array[1]}')
-range=$(echo $gate | awk -F"." '{print $1}')"."$(echo $gate | awk -F"." '{print $2}')"."$(echo $gate | awk -F"." '{print $3}')".0"
-access=$(echo $2 | awk -F"." '{print $1}')"."$(echo $2 | awk -F"." '{print $2}')"."$(echo $2 | awk -F"." '{print $3}')".1"
-
-ifconfig $1 up $access netmask 255.255.255.0
-sleep 2
-
-sysctl -w net.ipv4.ip_forward=1
-
-route add -net $range netmask 255.255.255.0 gw $gate
-route add -net $2/24 gw $gate
-
-iptables -F
-iptables -t nat -F
-iptables -X
-iptables -t nat -X
-iptables -t nat -A POSTROUTING -o $3 -j MASQUERADE
-iptables -A FORWARD -i $1 -j ACCEPT
-
-service NetworkManager stop
