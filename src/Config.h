@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <iostream>
@@ -16,6 +17,7 @@ namespace config
 	const string& loggingFilter();
 	const string& repoFilter();
 	const string& broadcastInterface();
+	const string& externalInterface();
 
 	// Routing Variables
 	const string& ssid();
@@ -36,5 +38,5 @@ namespace config
 
 void getConfig(const char* file);
 void makeConfig();
-#endif
 
+#endif

@@ -4,6 +4,9 @@
 
 int main(int argc, const char* argv[])
 {
+	pthread_t incomingThread;
+	int errno;
+
 	if(getuid() != 0)
 	{
 		cout << "Permission denied: root privileges are required." << endl;
@@ -26,10 +29,17 @@ int main(int argc, const char* argv[])
 		{
 			cout << "Invalid input. Program terminated." << endl;
 		}
+		return 1;
 	}
 
 	rSetup();
+	if((errno=pthread_create(&incomingThread, NULL, &incomingMasq, NULL)) != 0)
+	{
+		// Put logging here
+		//printf("Thread creation failed: %d\n", rc1);
+	}
 
+	pthread_join(incomingThread, NULL);
 	return 0;
 }
 

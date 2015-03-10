@@ -7,6 +7,7 @@ string _firewallFilter;
 string _loggingFilter;
 string _repoFilter;
 string _broadcastInterface;
+string _externalInterface;
 
 // Routing Variables
 string _ssid;
@@ -30,6 +31,7 @@ const string& config::firewallFilter() {return _firewallFilter;}
 const string& config::loggingFilter() {return _loggingFilter;}
 const string& config::repoFilter() {return _repoFilter;}
 const string& config::broadcastInterface() {return _broadcastInterface;}
+const string& config::externalInterface() {return _externalInterface;}
 
 // Routing Variables
 const string& config::ssid() {return _ssid;}
@@ -67,27 +69,31 @@ void getConfig(const char* file)
 			if(data.find("protocols:") != string::npos)
 			{
 				_protocols.clear();
-				_protocols.append(data.substr(10).c_str());
+				_protocols.append(data.substr(10));
 			} else if(data.find("firewall-filter:") != string::npos)
 			{
 				_firewallFilter.clear();
-				_firewallFilter.append(data.substr(16).c_str());
+				_firewallFilter.append(data.substr(16));
 			} else if(data.find("logging-filter:") != string::npos)
 			{
 				_loggingFilter.clear();
-				_loggingFilter.append(data.substr(10).c_str());			
+				_loggingFilter.append(data.substr(10));			
 			} else if(data.find("repo-filter:") != string::npos)
 			{
 				_repoFilter.clear();
-				_repoFilter.append(data.substr(12).c_str());
+				_repoFilter.append(data.substr(12));
 			} else if(data.find("broadcastInterface:") != string::npos)
 			{
 				_broadcastInterface.clear();
-				_broadcastInterface.append(data.substr(19).c_str());
+				_broadcastInterface.append(data.substr(19));
+			} else if(data.find("externalInterface:") != string::npos)
+			{
+				_externalInterface.clear();
+				_externalInterface.append(data.substr(18));
 			} else if(data.find("ssid:") != string::npos)
 			{
 				_ssid.clear();
-				_ssid.append(data.substr(5).c_str());
+				_ssid.append(data.substr(5));
 			} else if(data.find("nmode:") != string::npos)
 			{
 				if(data.find("infrastructure") != string::npos)
@@ -112,7 +118,7 @@ void getConfig(const char* file)
 			} else if(data.find("password:") != string::npos)
 			{
 				_password.clear();
-				_password.append(data.substr(9).c_str());
+				_password.append(data.substr(9));
 			} else if(data.find("firewall:") != string::npos)
 			{
 				if(data.find("on") != string::npos)

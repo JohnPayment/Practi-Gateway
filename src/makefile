@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS  = -g -Wall
+CFLAGS  = -g -Wall -lpthread -lnetfilter_queue
 
 # typing 'make' will invoke the first target entry in the file 
 # (in this case the default target entry)
