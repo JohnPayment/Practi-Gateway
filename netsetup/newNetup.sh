@@ -17,21 +17,21 @@ iwconfig $WDEV txpower auto
 # Check the address range matches the ones in /etc/dnsmasq.d/wlan-ap.conf
 ifconfig $WDEV 10.240.47.1/24 up
 
-#iptables -F
-#iptables -X
-#iptables -t nat -F
-#iptables -t nat -X
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
 
-#iptables -I INPUT -i $WDEV -j ACCEPT
+iptables -I INPUT -i $WDEV -j ACCEPT
 
-#echo "1" > /proc/sys/net/ipv4/ip_forward
+echo "1" > /proc/sys/net/ipv4/ip_forward
 
-#route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.254
-#route add -net 10.240.47.0/24 gw 10.240.47.1
+route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.254
+route add -net 10.240.47.0/24 gw 10.240.47.1
 
-#iptables -t nat -A POSTROUTING -j MASQUERADE
-#iptables -I FORWARD -i $IDEV -o $WDEV -j ACCEPT
-#iptables -I FORWARD -i $WDEV -o $IDEV -j ACCEPT
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -A FORWARD -i $IDEV -o $WDEV -j NFQUEUE --queue-num 0
+iptables -A FORWARD -i $WDEV -o $IDEV -j NFQUEUE --queue-num 1
 
 #service NetworkManager stop
 
