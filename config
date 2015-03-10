@@ -1,35 +1,37 @@
 ===============
  User Settings
 ===============
-protocols: ./protocols
-firewall-filter: ./filters/firewall
-logging-filter: ./filters/logger
-repo-filter: ./filters/replacer
+protocols:./protocols
+firewall-filter:./filters/firewall
+logging-filter:./filters/logger
+repo-filter:./filters/replacer
 
 ==================
  Routing Settings
 ==================
-broadcastInterface: wlan0
-ssid: testgateway
-nmode: infrastructure
-wpa: off
-password: password
+broadcastInterface:wlp0s26f7u1
+externalInterface:em1
+ssid:testgateway
+nmode:infrastructure
+wpa:off
+password:password
 
-inter-ip: 192.168.10.0
+inter-ip:10.240.47.0
+exter-ip:192.168.2.10
 
 ===================
  Firewall Settings
 ===================
-firewall: off
+firewall:off
 
 ==================
  Logging Settings
 ==================
-logging: off
-smartlookup: off
+logging:off
+smartlookup:off
 
 =====================
  Payload Replacement
 =====================
-payloadreplacement: off
+payloadreplacement:off
 
