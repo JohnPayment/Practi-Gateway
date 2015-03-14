@@ -1,6 +1,7 @@
 #ifndef ROUTING_H
 #define ROUTING_H
 #include "Config.h"
+#include "Logging.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

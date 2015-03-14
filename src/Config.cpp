@@ -49,6 +49,18 @@ bool config::smartLookup() {return _smartLookup;}
 // Payload Replacement Variables
 bool config::payloadReplacement() {return _payloadReplacement;}
 
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	getConfig()
+-- REVISION:	2015-03-11
+-- PARAMETERS:	const char* file - The name of the file from which config variables should be loaded.
+-- RETURN:		void
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		This function loads config variables based upon the contents of the specified
+--				file.
+------------------------------------------------------------------------------------------------
+*/
 void getConfig(const char* file)
 {
 	ifstream config(file);
@@ -77,16 +89,16 @@ void getConfig(const char* file)
 			} else if(data.find("logging-filter:") != string::npos)
 			{
 				_loggingFilter.clear();
-				_loggingFilter.append(data.substr(10));			
+				_loggingFilter.append(data.substr(15));			
 			} else if(data.find("repo-filter:") != string::npos)
 			{
 				_repoFilter.clear();
 				_repoFilter.append(data.substr(12));
-			} else if(data.find("broadcastInterface:") != string::npos)
+			} else if(data.find("broadcastinterface:") != string::npos)
 			{
 				_broadcastInterface.clear();
 				_broadcastInterface.append(data.substr(19));
-			} else if(data.find("externalInterface:") != string::npos)
+			} else if(data.find("externalinterface:") != string::npos)
 			{
 				_externalInterface.clear();
 				_externalInterface.append(data.substr(18));
@@ -146,7 +158,7 @@ void getConfig(const char* file)
 				{
 					_smartLookup = false;
 				}
-			} else if(data.find("payloadReplacement:") != string::npos)
+			} else if(data.find("payloadreplacement:") != string::npos)
 			{
 				if(data.find("on") != string::npos)
 				{
@@ -161,40 +173,82 @@ void getConfig(const char* file)
 	}
 }
 
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	makeConfig()
+-- REVISION:	2015-03-11
+-- PARAMETERS:	N/A
+-- RETURN:		void
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Writes a new config file with default parameters.
+------------------------------------------------------------------------------------------------
+*/
 void makeConfig()
 {
 	ofstream config("config", ios_base::out);
 	config << "===============" << endl;
 	config << " User Settings " << endl;
 	config << "===============" << endl;
-	config << "protocols: ./protocols" << endl;
-	config << "firewall-filter: ./filters/firewall" << endl;
-	config << "logging-filter: ./filters/logger" << endl;
-	config << "repo-filter: ./filters/replacer" << endl << endl;
+	config << "protocols:./protocols" << endl;
+	config << "firewall-filter:./filters/firewall" << endl;
+	config << "logging-filter:./filters/logger" << endl;
+	config << "repo-filter:./filters/replacer" << endl << endl;
 
 	config << "==================" << endl;
 	config << " Routing Settings " << endl;
 	config << "==================" << endl;
-	config << "broadcastInterface: wlan0" << endl;
-	config << "ssid: testgateway" << endl;
-	config << "nmode: infrastructure" << endl;
-	config << "wpa: off" << endl;
-	config << "password: pass" << endl << endl;
+	config << "broadcastInterface:wlan0" << endl;
+	config << "externalInterface:em1" << endl;
+	config << "ssid:testgateway" << endl;
+	config << "nmode:infrastructure" << endl;
+	config << "wpa:off" << endl;
+	config << "password:password" << endl << endl;
+
+	config << "inter-ip:10.240.47.0" << endl;
+	config << "exter-ip:192.168.2.10" << endl << endl;
 
 	config << "===================" << endl;
 	config << " Firewall Settings " << endl;
 	config << "===================" << endl;
-	config << "firewall: off" << endl << endl;
+	config << "firewall:off" << endl << endl;
 
 	config << "==================" << endl;
 	config << " Logging Settings " << endl;
 	config << "==================" << endl;
-	config << "logging: off" << endl;
-	config << "smartlookup: off" << endl << endl;
+	config << "logging:off" << endl;
+	config << "smartlookup:off" << endl << endl;
 
 	config << "=====================" << endl;
 	config << " Payload Replacement " << endl;
 	config << "=====================" << endl;
-	config << "payloadreplacement: off" << endl << endl;
+	config << "payloadreplacement:off" << endl << endl;
+}
+
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	string_split()
+-- DATE:		2015-03-13
+-- PARAMETERS:	const string &s - The string to be split.
+--				char delim - The character on which to split the string.
+--				vector<string> &dest - The vector in which the resulting string elements should be stored.
+-- RETURN:		vector<string>& - Returns a references to the vector which is storing the split string elements
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		This function splits a string on the delimited character and stores the
+--				resulting elements in dest.
+------------------------------------------------------------------------------------------------
+*/
+vector<string> &string_split(const string &s, char delim, vector<string> &dest)
+{
+	stringstream ss(s);
+	string item;
+	while(std::getline(ss, item, delim)) 
+	{
+		item.erase(remove_if(item.begin(), item.end(), ::isspace ), item.end() );
+		transform(item.begin(), item.end(), item.begin(), ::tolower);
+		dest.push_back(item);
+	}
+	return dest;
 }
 

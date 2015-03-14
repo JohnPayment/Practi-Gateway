@@ -7,14 +7,17 @@ CFLAGS  = -g -Wall -lpthread -lnetfilter_queue
 # are the most commonly used names by convention
 default: gateway
 
-gateway: gateway.o routing.o config.o
-	$(CC) $(CFLAGS) Gateway.o Routing.o Config.o -o ../practiGateway.exe
+gateway: gateway.o routing.o logging.o config.o
+	$(CC) $(CFLAGS) Gateway.o Routing.o Logging.o Config.o -o ../practiGateway.exe
 
 gateway.o: Gateway.cpp Config.h 
 	$(CC) $(CFLAGS) -c Gateway.cpp
 
-routing.o: Routing.cpp Routing.h Config.h
-	$(CC) $(CFLAGS) -c Routing.cpp	
+routing.o: Routing.cpp Routing.h Logging.h Config.h
+	$(CC) $(CFLAGS) -c Routing.cpp
+
+logging.o: Logging.cpp Logging.h Config.h
+	$(CC) $(CFLAGS) -c Logging.cpp	
 
 config.o: Config.cpp Config.h 
 	$(CC) $(CFLAGS) -c Config.cpp

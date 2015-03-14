@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 namespace config
@@ -38,5 +41,7 @@ namespace config
 
 void getConfig(const char* file);
 void makeConfig();
+
+vector<string> &string_split(const string &s, char delim, vector<string> &dest);
 
 #endif

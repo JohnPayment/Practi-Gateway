@@ -5,6 +5,7 @@
 int main(int argc, const char* argv[])
 {
 	pthread_t incomingThread;
+	pthread_t outgoingThread;
 	int errno;
 
 	if(getuid() != 0)
@@ -32,14 +33,19 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
+	loadRules(config::loggingFilter().c_str());
 	rSetup();
 	if((errno=pthread_create(&incomingThread, NULL, &incomingMasq, NULL)) != 0)
 	{
-		// Put logging here
-		//printf("Thread creation failed: %d\n", rc1);
+		cout << "Creation of incoming packet manager failed" << endl;
+	}
+	if((errno=pthread_create(&outgoingThread, NULL, &outgoingMasq, NULL)) != 0)
+	{
+		cout << "Creation of outgoing packet manager failed" << endl;
 	}
 
 	pthread_join(incomingThread, NULL);
+	pthread_join(outgoingThread, NULL);
 	return 0;
 }
 
