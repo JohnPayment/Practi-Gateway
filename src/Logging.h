@@ -160,7 +160,7 @@ struct packet
 
 
 // Functions
-void loadRules(const char* file);
+void loadLoggingRules(const char* file);
 void unloadRules();
 
 void pushInputQueue(const unsigned char *packetData, size_t packetSize);

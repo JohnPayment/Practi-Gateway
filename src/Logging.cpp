@@ -24,7 +24,7 @@ queue<packet> outPackets;
 --				packets using the rules set in the file whose name is provided.
 ------------------------------------------------------------------------------------------------
 */
-void loadRules(const char* file)
+void loadLoggingRules(const char* file)
 {
 	ifstream logRules(file);
 	if(logRules.fail())
@@ -51,34 +51,19 @@ void loadRules(const char* file)
 				// Starting new rule chains
 				if(words[i].find("in") != string::npos)
 				{
-					if(lastRule->logRule == NULL)
-					{
-						lastRule->logRule = (logRule*)malloc(sizeof(logRule));
-						memset(lastRule->logRule, 0xF, sizeof(logRule));
-					}
 					protoRule newRule = {};
 					inRules.push_back(newRule);
-					lastRule = &(inRules.front());
+					lastRule = &(inRules.back());
 				} else if(words[i].find("out") != string::npos)
 				{
-					if(lastRule->logRule == NULL)
-					{
-						lastRule->logRule = (logRule*)malloc(sizeof(logRule));
-						memset(lastRule->logRule, 0xF, sizeof(logRule));
-					}
 					protoRule newRule = {};
 					outRules.push_back(newRule);
-					lastRule = &(outRules.front());
+					lastRule = &(outRules.back());
 				} else if(words[i].find("both") != string::npos)
 				{
-					if(lastRule->logRule == NULL)
-					{
-						lastRule->logRule = (logRule*)malloc(sizeof(logRule));
-						memset(lastRule->logRule, 0xF, sizeof(logRule));
-					}
 					protoRule newRule = {};
 					bothRules.push_back(newRule);
-					lastRule = &(bothRules.front());
+					lastRule = &(bothRules.back());
 				// Creating a new rule within the current rule chain
 				} else if(words[i].find("_") != string::npos)
 				{

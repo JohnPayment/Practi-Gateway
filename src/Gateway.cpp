@@ -33,7 +33,10 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-	loadRules(config::loggingFilter().c_str());
+	if (config::logging())
+	{
+		loadLoggingRules(config::loggingFilter().c_str());
+	}
 	rSetup();
 	if((errno=pthread_create(&incomingThread, NULL, &incomingMasq, NULL)) != 0)
 	{
