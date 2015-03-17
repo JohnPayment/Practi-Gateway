@@ -27,7 +27,7 @@ void rSetup()
 	pthread_t outgoingThread;
 	int errno;
 
-	if (config::logging)
+	if (config::logging())
 	{
 		if((errno=pthread_create(&incomingThread, NULL, &incomingLog, NULL)) != 0)
 		{
@@ -209,7 +209,7 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	int id = 0;
 	struct nfqnl_msg_packet_hdr *msgPacketHandler;
 	struct nfqnl_msg_packet_hw *hwPacketHandler;
-	u_int32_t mark,ifi; 
+	//u_int32_t mark,ifi; 
 	int ret;
 	unsigned char *packetData;
 
@@ -223,7 +223,7 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	hwPacketHandler = nfq_get_packet_hw(nfa);
 	if (hwPacketHandler) 
 	{
-		int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
+		//int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
 
 		/*printf("hw_src_addr=");
 		for (i = 0; i < hlen-1; i++)
@@ -236,9 +236,9 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	ret = nfq_get_payload(nfa, &packetData);
 	if (ret >= 0)
 	{
-		struct sockaddr_in source,dest;
-		source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
-		dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
+		//struct sockaddr_in source,dest;
+		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
+		//dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
 		//printf("payload_len=%d ", ret);
 		//printf("Src Adr: %s ", inet_ntoa(source.sin_addr));
 		//printf("Dst Adr: %s ", inet_ntoa(dest.sin_addr));
@@ -275,7 +275,7 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	int id = 0;
 	struct nfqnl_msg_packet_hdr *msgPacketHandler;
 	struct nfqnl_msg_packet_hw *hwPacketHandler;
-	u_int32_t mark,ifi; 
+	//u_int32_t mark,ifi; 
 	int ret;
 	unsigned char *packetData;
 
@@ -288,15 +288,15 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	hwPacketHandler = nfq_get_packet_hw(nfa);
 	if (hwPacketHandler) 
 	{
-		int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
+		//int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
 	}
 
 	ret = nfq_get_payload(nfa, &packetData);
 	if (ret >= 0)
 	{
-		struct sockaddr_in source,dest;
-		source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
-		dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
+		//struct sockaddr_in source,dest;
+		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
+		//dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
 
 		if (config::logging())
 		{
