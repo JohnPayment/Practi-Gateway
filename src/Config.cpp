@@ -223,6 +223,8 @@ void makeConfig()
 	config << " Payload Replacement " << endl;
 	config << "=====================" << endl;
 	config << "payloadreplacement:off" << endl << endl;
+
+	config.close();
 }
 
 /*

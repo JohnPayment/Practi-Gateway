@@ -170,6 +170,6 @@ void* incomingLog(void* var);
 void* outgoingLog(void* var);
 logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSize);
 
-void logPacket(logRule* rule, struct packet* pckt);
+void logPacket(logRule* rule, struct packet* pckt, const char* fileName);
 
 #endif

@@ -59,7 +59,7 @@ void* incomingMasq(void* var)
 	//struct nfnl_handle *nh;
 	int fd;
 	int dataSize;
-	char buffer[4096] __attribute__ ((aligned));
+	char buffer[4096];// __attribute__ ((aligned));
 
 	// Opening nfq Library
 	nfqHandle = nfq_open();
@@ -133,7 +133,7 @@ void* outgoingMasq(void* var)
 	//struct nfnl_handle *nh;
 	int fd;
 	int dataSize;
-	char buffer[4096] __attribute__ ((aligned));
+	char buffer[4096];// __attribute__ ((aligned));
 
 	// Opening nfq Library
 	nfqHandle = nfq_open();
