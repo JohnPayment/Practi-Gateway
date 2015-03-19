@@ -1677,7 +1677,7 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 {
 	if(rule != NULL)
 	{
-		ofstream logFile(fileName, ios_base::out);
+		ofstream logFile(fileName, ios_base::app);
 		logFile << "\n\n*************************Packet***************************" << endl;
 		//ip
 		if(rule->ip != 0)
