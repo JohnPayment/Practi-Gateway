@@ -3,17 +3,26 @@
 # The ttl is greater than 20
 # The TCP source port is 80
 # The TCP destination port is not 43
-IN IP SRC == 192.168.0.1 DST == 192.168.0.1
-_  IP ttl >> 20
+IN IP ttl >> 20
 _  TCP SRC == 80
 _  TCP DST != 43
+LOG TCP SRC DST FLAGS
 
 # This filter is valid if the IP has the evil and do not fragment bits unset and the UDP source or destination port is 43.
 OUT IP flags >= 1
 _   UDP SRC == 43 DST == 43
+LOG IP SRC DST FLAGS
 
 # This filter is valid if the ICMP type is less than 4.
 BOTH ICMP type << 4
+LOG IP SRC DST
+LOG ICMP TYPE
+
+OUT IP SRC == 10.240.47.106
+LOG IP SRC DST
+LOG TCP SRC DST
+LOG UDP SRC DST
+LOG ICMP TYPE CODE
 
 # Note that, in cases where a protocol must be set to view a variable, only packets which contain that protocol will be valid.
 
