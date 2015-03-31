@@ -1334,7 +1334,7 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 	if(rule != NULL)
 	{
 		ofstream logFile(fileName, ios_base::app);
-		logFile << "\n\n*************************Packet***************************" << endl;
+		logFile << "\n\n**************************Packet****************************" << endl;
 		logFile << "Timestamp: " << time(NULL) << endl;
 		//ip
 		if(rule->ip != 0)
@@ -1454,7 +1454,38 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 		{
 		}
 
-		logFile << endl << "###############################################################" << endl;
+		// Raw Data
+		size_t payloadOffset = 0;
+		switch(pckt->packet.ip.protocol)
+		{
+			case 6: //TCP
+				payloadOffset = sizeof(struct iphdr) + sizeof(struct tcphdr);
+				break;
+			case 17: // UDP
+				payloadOffset = sizeof(struct iphdr) + sizeof(struct udphdr);
+				break;
+			case 1: // ICMP
+				payloadOffset = sizeof(struct iphdr) + sizeof(struct icmphdr);
+				break;
+			default:
+				payloadOffset = sizeof(struct iphdr);
+		}
+
+		logFile << endl << "###########################PAYLOAD###########################" << endl;
+		for(size_t i = 0; i < pckt->packetSize - payloadOffset; ++i)
+		{
+			logFile << " " << hex << setw(2) << setfill('0') << (unsigned int)pckt->packet.buffer[i];
+			if(i != 0 && i%16 == 0)
+			{
+				logFile << "	\"";
+				for(size_t j = i-15; j <= i; ++j)
+				{
+					logFile << pckt->packet.buffer[j];
+				}
+				logFile << "\"" << endl;
+			} 
+		}
+		logFile << endl;
 		logFile.close();
 	}
 }
