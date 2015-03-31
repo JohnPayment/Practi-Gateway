@@ -412,7 +412,7 @@ size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSiz
 				payloadOffset = ipSize;
 		}
 
-		realloc(packetData, payloadOffset + load->payloadSize);
+		packetData = (unsigned char*)realloc(packetData, payloadOffset + load->payloadSize);
 		memcpy((packetData + payloadOffset), load->buffer, load->payloadSize);
 
 		((iphdr*)packetData)->tot_len = payloadOffset + load->payloadSize;

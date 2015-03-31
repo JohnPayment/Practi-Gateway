@@ -1,6 +1,8 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 #include "Config.h"
+#include "whois.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
