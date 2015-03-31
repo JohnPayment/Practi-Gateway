@@ -2,6 +2,7 @@
 #define ROUTING_H
 #include "Config.h"
 #include "Logging.h"
+#include "Payload.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

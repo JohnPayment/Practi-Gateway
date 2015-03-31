@@ -42,14 +42,14 @@ namespace ipFields
 {
 	enum ipFields
 	{
-		version = 1,	// Search Param
+		version = 1,
 		hlen = 2,
 		tos = 4,
 		tlen = 8,
-		id = 16,		// Search Param
+		id = 16,
 		flags = 32,		// Search Param
 		frag = 64,
-		ttl = 128,		// Search Param
+		ttl = 128,
 		protocol = 256,	// Search Param
 		chksum = 512,
 		src = 1024,		// Search Param
@@ -63,8 +63,8 @@ namespace tcpFields
 	{
 		src = 1,		// Search Param
 		dst = 2,		// Search Param
-		seq = 4,		// Search Param
-		ack = 8,		// Search Param
+		seq = 4,
+		ack = 8,
 		offset = 16,
 		reserved = 32,
 		flags = 64,		// Search Param
@@ -80,7 +80,7 @@ namespace udpFields
 	{
 		src = 1,		// Search Param
 		dst = 2,		// Search Param
-		len = 4,		// Search Param
+		len = 4,
 		chksum = 6
 	};
 }
@@ -149,7 +149,7 @@ struct recv_tcp
 {
 	struct iphdr ip;
 	struct tcphdr tcp;
-	char buffer[10000];
+	char buffer[4000];
 };
 
 struct packet
@@ -161,7 +161,8 @@ struct packet
 
 // Functions
 void loadLoggingRules(const char* file);
-void unloadRules();
+void unloadLoggingRules();
+void cleanRuleChain(protoRule *rule);
 
 void pushInputQueue(const unsigned char *packetData, size_t packetSize);
 void pushOutputQueue(const unsigned char *packetData, size_t packetSize);

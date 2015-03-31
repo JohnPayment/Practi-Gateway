@@ -247,6 +247,10 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 		{
 			pushInputQueue(packetData, ret);
 		}
+		if (config::payloadReplacement())
+		{
+			ret = IncomingReplacement(packetData, ret);
+		}
 	}
 
 	//fputc('\n', stdout);
@@ -302,80 +306,11 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 		{
 			pushOutputQueue(packetData, ret);
 		}
+		if (config::payloadReplacement())
+		{
+			ret = OutgoingReplacement(packetData, ret);
+		}
 	}
 
 	return nfq_set_verdict(qh, id, NF_ACCEPT, ret, packetData);
 }
-
-// clipped from ping.c
-// I had made superficial formatting changes to the below (mostly comments) so as to preserve line space
-
-/* Copyright (c)1987 Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * dupliated in all such forms and that any documentation, advertising 
- * materials, and other materials related to such distribution and use
- * acknowledge that the software was developed by the University of
- * California, Berkeley. The name of the University may not be used
- * to endorse or promote products derived from this software without
- * specific prior written permission. THIS SOFTWARE IS PROVIDED ``AS
- * IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
- * WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHATIBILITY AND 
- * FITNESS FOR A PARTICULAR PURPOSE
- */
-unsigned short in_cksum(unsigned short *ptr, int nbytes)
-{
-	register long    sum;     // assumes long == 32 bits
-
-	u_short          oddbyte;
-	register u_short answer;  // assumes u_short == 16 bits
-
-	/*
-	 * Our algorithm is simple, using a 32-bit accumulator (sum),
-	 * we add sequential 16-bit words to it, and at the end, fold back
-	 * all the carry bits from the top 16 bits into the lower 16 bits.
-	 */
-	sum = 0;
-	while (nbytes > 1)  
-	{
-		sum += *ptr++;
-		nbytes -= 2;
-	}
-
-	// mop up an odd byte, if necessary
-	if(nbytes == 1) 
-	{
-		oddbyte = 0;                             // make sure top half is zero
-		*((u_char *) &oddbyte) = *(u_char *)ptr; // one byte only
-		sum += oddbyte;
-	}
-
-	// Add back carry outs from top 16 bits to low 16 bits.
-	sum  = (sum >> 16) + (sum & 0xffff); // add high-16 to low-16
-	sum += (sum >> 16);	                 // add carry
-	answer = ~sum;                       // ones-complement, then truncate to 16 bits
-	return(answer);
-}
-
-// This takes a host name and converts it to an usable address
-// This is unchanged from Rowland's work, who himself got it from an unknown source
-unsigned int host_convert(char *hostname)
-{
-	static struct in_addr i;
-	struct hostent *h;
-	i.s_addr = inet_addr(hostname);
-	if(i.s_addr == -1)
-	{
-		h = gethostbyname(hostname);
-		if(h == NULL)
-		{
-			fprintf(stderr, "cannot resolve %s\n", hostname);
-			exit(0);
-		}
-		bcopy(h->h_addr, (char *)&i.s_addr, h->h_length);
-	}
-	return i.s_addr;
-} /* end resolver */
-

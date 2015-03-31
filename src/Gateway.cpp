@@ -37,6 +37,11 @@ int main(int argc, const char* argv[])
 	{
 		loadLoggingRules(config::loggingFilter().c_str());
 	}
+	if (config::payloadReplacement())
+	{
+		loadPayloadRules(config::repoFilter().c_str());
+	}
+
 	rSetup();
 	if((errno=pthread_create(&incomingThread, NULL, &incomingMasq, NULL)) != 0)
 	{
