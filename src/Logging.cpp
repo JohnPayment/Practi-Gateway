@@ -1335,11 +1335,12 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 	{
 		ofstream logFile(fileName, ios_base::app);
 		logFile << "\n\n*************************Packet***************************" << endl;
+		logFile << "Timestamp: " << time(NULL) << endl;
 		//ip
 		if(rule->ip != 0)
 		{
 			struct sockaddr_in address;
-	
+
 			logFile << endl;
 			logFile << "IP Header" << endl;
 			if(rule->ip & ipFields::version)
