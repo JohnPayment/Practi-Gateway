@@ -1,0 +1,24 @@
+00000 : Reserved for Special Use
+00020 : FTP Data Transfer
+00021 : FTP Control
+00022 : SSH (Secure Shell)
+00023 : Telnet
+00025 : SMTP (Simple Mail Transfer Protocol)
+00043 : Whois Protocol
+00050 : RMCP (Remote Mail Checking Protocol)
+00053 : DNS (Domain Name System)
+00080 : HTTP (Hyper Text Transfer Protocol)
+00443 : HTTPS (Hypter Text Transfer Protocol over TLS/SSL)
+00989 : FTPS Data
+00990 : FTPS Control
+06660 : Common IRC Port (Internet Chat Relay)
+06661 : Common IRC Port (Internet Chat Relay)
+06662 : Common IRC Port (Internet Chat Relay)
+06663 : Common IRC Port (Internet Chat Relay)
+06664 : Common IRC Port (Internet Chat Relay)
+06665 : Common IRC Port (Internet Chat Relay)
+06666 : Common IRC Port (Internet Chat Relay)
+06667 : Common IRC Port (Internet Chat Relay)
+06668 : Common IRC Port (Internet Chat Relay)
+06669 : Common IRC Port (Internet Chat Relay)
+65535 : Highest Possible Port
