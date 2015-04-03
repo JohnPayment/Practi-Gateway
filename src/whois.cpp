@@ -3,8 +3,21 @@
 using namespace std;
 
 // Forward Declarations
-void writeFile(const char* ip, string response);
+void writeFile(const char* ip, const string* response);
 
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	getWhois()
+-- DATE:		2015-03-30
+-- PARAMETERS:	char* query - The ip address to get Whois information
+-- RETURN:		A string containing all of the whois information.
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Takes an IP address in a c string and gets whois information for that address.
+--				The function first checks for this info in a file at /filter/whois/ and only
+--				If there is no local data does it perform a net search.
+------------------------------------------------------------------------------------------------
+*/
 string getWhois(char* query)
 {
 	string response;
@@ -16,28 +29,46 @@ string getWhois(char* query)
 	{
 		queryWhois("whois.iana.org", query, &response);
 
-		vector<string> lines;
-		string_split(response, ' ', lines);
-		for(size_t i = 0; i < lines.size(); ++i)
+		stringstream repstream(response);
+		string line;
+		size_t pos = 0;
+		while(getline(repstream, line))
 		{
-			if(lines[i].find("whois.") != string::npos)
+			if((pos = line.find("whois.")) != string::npos)
 			{
-				queryWhois(&(lines[i][lines[i].find("whois.")]), query, &response);
+				queryWhois(&(line[pos]), query, &response);
 				break;
 			}
 		}
+
+		writeFile(query, &response);
 	} else if (whoisLog.is_open() == true)
 	{
 		string data;
 		while(getline(whoisLog, data))
 		{
 			response.append(data);
+			response.append("\n");
 		}
 	}
-	
+
+	whoisLog.close();
 	return response;
 }
 
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	queryWhois()
+-- DATE:		2015-03-30
+-- PARAMETERS:	const char* server - the first whois server to start whois lookup
+--				const char* query - The ip address to get Whois information
+--				string* response - A pointer to a string which will store looked up whois info.
+-- RETURN:		void
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Performs whois lookup over a network on the ip address in query.
+------------------------------------------------------------------------------------------------
+*/
 void queryWhois(const char* server, const char* query, string* response)
 {
 	char buffer[1000];
@@ -63,7 +94,9 @@ void queryWhois(const char* server, const char* query, string* response)
 		return;
 	}
 
-	if(send(s, query, strlen(query) , 0) < 0)
+	string message(query);
+	message.append("\r\n");
+	if(send(s, message.c_str(), message.size() , 0) < 0)
 	{
 		close(s);
 		return;
@@ -75,6 +108,9 @@ void queryWhois(const char* server, const char* query, string* response)
 		if(size > 0)
 		{
 			response->append(buffer, size);
+		} else
+		{
+			break;
 		}
 	}
 
@@ -83,12 +119,168 @@ void queryWhois(const char* server, const char* query, string* response)
 	return;
 }
 
-void writeFile(const char* ip, string response)
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	smartLog()
+-- DATE:		2015-04-01
+-- PARAMETERS:	char* ip - The ip address for which smart log info is required
+--				smrt* log - A pointer to the smrt structure to be populated
+-- RETURN:		boid
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Populates a smrt structure with data.
+------------------------------------------------------------------------------------------------
+*/
+void smartLog(char* ip, smrt* log)
+{
+	string rawLog(getWhois(ip));
+	stringstream logstream(rawLog);
+
+	string data;
+	while(getline(logstream, data))
+	{
+		size_t place = 0;
+		if(data.find("No whois data") != string::npos)
+		{
+			break;
+		} else if((place = data.find("CIDR:")) != string::npos)
+		{
+			place += strlen("CIDR:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->subnet.assign(data.substr(place));
+		} else if((place = data.find("NetName:")) != string::npos)
+		{
+			place += strlen("NetName:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->netname.assign(data.substr(place));
+		} else if((place = data.find("Organization:")) != string::npos)
+		{
+			place += strlen("Organization:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->org.assign(data.substr(place));
+		} else if((place = data.find("Updated:")) != string::npos)
+		{
+			place += strlen("Updated:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->lastupdate.assign(data.substr(place));
+		} else if((place = data.find("Address:")) != string::npos)
+		{
+			place += strlen("Address:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->address.assign(data.substr(place));
+		} else if((place = data.find("City:")) != string::npos)
+		{
+			place += strlen("City:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->city.assign(data.substr(place));
+		} else if((place = data.find("StateProv:")) != string::npos)
+		{
+			place += strlen("StateProv:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->provcode.assign(data.substr(place));
+		} else if((place = data.find("Country:")) != string::npos)
+		{
+			place += strlen("Country:");
+			for(; place < data.size(); ++place)
+			{
+				if(data[place] != ' ')
+				{
+					break;
+				}
+			}
+			log->country.assign(data.substr(place));
+		}
+	}
+}
+
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	getPortUsage()
+-- DATE:		2015-03-30
+-- PARAMETERS:	unsigned int port - The port number to look up
+-- RETURN:		A string containing the port data, if any.
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Looks up dara about the given port locally and returns the a string with any data
+--				found.
+------------------------------------------------------------------------------------------------
+*/
+string getPortUsage(unsigned int port)
+{
+	ifstream log("./filters/ports");
+	string data;
+	while(getline(log, data))
+	{
+		if(port == atoi(data.c_str()))
+		{
+			return data.substr(7);
+			break;
+		}
+	}
+	data.assign("No Common Uses Documented.");
+	return data;
+}
+
+/*
+-----------------------------------------------------------------------------------------------
+-- FUNCTION: 	writeFile()
+-- DATE:		2015-03-30
+-- PARAMETERS:	const char* ip - The ip address and file name for which whois info should be logged.
+--				string response - The whois data to be logged
+-- RETURN:		void
+-- DESIGNER:	John Payment
+-- PROGRAMMER:	John Payment
+-- NOTES:		Writes whois information for a particular IP address to a file of the same name.
+------------------------------------------------------------------------------------------------
+*/
+void writeFile(const char* ip, const string* response)
 {
 	string dest = "./filters/whois/";
 	dest.append(ip);
 	ofstream config(dest.c_str(), ios_base::out);
-	config << response;
+	config << *response;
 	config.close();
 }
 

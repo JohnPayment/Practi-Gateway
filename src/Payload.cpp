@@ -277,8 +277,12 @@ void loadPayloadRules(const char* file)
 					FILE* fp;
 					fp = fopen(words[i].c_str(), "rb");
 					size_t j = 0;
-					while((((payload*)(lastRule->logRule))->buffer[j] = fgetc(fp)) != EOF && j < 4000)
+					while((((payload*)(lastRule->logRule))->buffer[j] = fgetc(fp)) != EOF)
 					{
+						if(j >= 4000)
+						{
+							break;
+						}
 						++j;
 					}
 					((payload*)(lastRule->logRule))->payloadSize = j;
@@ -320,7 +324,7 @@ void unloadPayloadRules()
 /*
 -----------------------------------------------------------------------------------------------
 -- FUNCTION: 	IncomingReplacement()
--- DATE:		2015-03-30
+-- DATE:		2015-04-03
 -- PARAMETERS:	const unsigned char *packetData - The raw packet data
 --				size_t packetsize - The total size of the packet data
 -- RETURN:		The new size of the packetData. 0 If there is no change.
@@ -329,60 +333,58 @@ void unloadPayloadRules()
 -- NOTES:		Checks incoming packets for whether they should have their payload replaced.
 ------------------------------------------------------------------------------------------------
 */
-size_t IncomingReplacement(unsigned char *packetData, size_t packetSize)
+size_t IncomingReplacement(packet *packetData)
 {
 	payload* rule;
 	for(size_t i = 0; i < inprRules.size(); ++i)
 	{
-		rule = (payload*) checkRule(&(inprRules[i]), (recv_tcp*)packetData, packetSize);
+		rule = (payload*) checkRule(&(inprRules[i]), &(packetData->packet), packetData->packetSize);
 		if(rule != NULL)
 		{
-			return replacePayload(rule, packetData, packetSize);
+			return replacePayload(rule, packetData);
 		}
 	}
-	return packetSize;
+	return packetData->packetSize;
 }
 
 /*
 -----------------------------------------------------------------------------------------------
 -- FUNCTION: 	OutgoingReplacement()
--- DATE:		2015-03-30
--- PARAMETERS:	const unsigned char *packetData - The raw packet data
---				size_t packetsize - The total size of the packet data
+-- DATE:		2015-04-03
+-- PARAMETERS:	packet *packetData - The raw packet data
 -- RETURN:		The new size of the packetData.
 -- DESIGNER:	John Payment
 -- PROGRAMMER:	John Payment
 -- NOTES:		Checks outgoing packets for whether they should have their payload replaced.
 ------------------------------------------------------------------------------------------------
 */
-size_t OutgoingReplacement(unsigned char *packetData, size_t packetSize)
+size_t OutgoingReplacement(packet *packetData)
 {
 	payload* rule;
 	for(size_t i = 0; i < outprRules.size(); ++i)
 	{
-		rule = (payload*) checkRule(&(outprRules[i]), (recv_tcp*)packetData, packetSize);
+		rule = (payload*) checkRule(&(outprRules[i]), &(packetData->packet), packetData->packetSize);
 		if(rule != NULL)
 		{
-			return replacePayload(rule, packetData, packetSize);
+			return replacePayload(rule, packetData);
 		}
 	}
-	return packetSize;
+	return packetData->packetSize;
 }
 
 /*
 -----------------------------------------------------------------------------------------------
 -- FUNCTION: 	replacePayload()
--- DATE:		2015-03-30
+-- DATE:		2015-04-03
 -- PARAMETERS:	payload* load - Pointer to structure defining the new payload
---				unsigned char *packetData - Pointer to the packetData
---				size_t packetSize - The total size of the packet in bytes
+--				packet *packetData - Pointer to the packetData
 -- RETURN:		The new packetSize.
 -- DESIGNER:	John Payment
 -- PROGRAMMER:	John Payment
 -- NOTES:		replaces the payload of the packet and recalculates checksums.
 ------------------------------------------------------------------------------------------------
 */
-size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSize)
+size_t replacePayload(payload* load, packet *packetData)
 {
 	if(load != NULL)
 	{
@@ -391,37 +393,34 @@ size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSiz
 		size_t udpSize = sizeof(struct udphdr);
 		size_t icmpSize = sizeof(struct icmphdr);
 
-		unsigned char protocol = 0;
+		unsigned char protocol = packetData->packet.ip.protocol;
 		size_t payloadOffset = 0;
-		switch(((iphdr*)packetData)->protocol)
+		switch(protocol)
 		{
-			case 6: //TCP
-				protocol = protocols::tcp;
+			case 6: // TCP
 				payloadOffset = ipSize + tcpSize;
+				memcpy(packetData->packet.buffer, load->buffer, load->payloadSize);
 				break;
 			case 17: // UDP
-				protocol = protocols::udp;
 				payloadOffset = ipSize + udpSize;
+				memcpy(&(packetData->packet.tcp) + udpSize, load->buffer, load->payloadSize);
 				break;
 			case 1: // ICMP
-				protocol = protocols::icmp;
 				payloadOffset = ipSize + icmpSize;
+				memcpy(&(packetData->packet.tcp) + icmpSize, load->buffer, load->payloadSize);
 				break;
 			default:
-				protocol = protocols::ip;
 				payloadOffset = ipSize;
+				memcpy(&(packetData->packet.tcp), load->buffer, load->payloadSize);
 		}
 
-		packetData = (unsigned char*)realloc(packetData, payloadOffset + load->payloadSize);
-		memcpy((packetData + payloadOffset), load->buffer, load->payloadSize);
-
-		((iphdr*)packetData)->tot_len = payloadOffset + load->payloadSize;
-		((iphdr*)packetData)->check = 0;
-		((iphdr*)packetData)->check = in_cksum((unsigned short *)packetData, 20);
+		packetData->packet.ip.tot_len = payloadOffset + load->payloadSize;
+		packetData->packet.ip.check = 0;
+		packetData->packet.ip.check = in_cksum((unsigned short *)&(packetData->packet), 20);
 
 		/*switch(protocol)
 		{
-			case protocols::tcp:
+			case 6: // TCP
 				pseudo_header.source_address = (iphdr*)packetData->saddr;
 				pseudo_header.dest_address = (iphdr*)packetData->daddr;
 				pseudo_header.placeholder = 0;
@@ -429,7 +428,7 @@ size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSiz
 				pseudo_header.tcp_length = htons(20);
 				((tcphdr*)(packetData + ipSize))->check = in_cksum((unsigned short *)&pseudo_header, 32);
 				break;
-			case protocols::udp:
+			case 17: // UDP
 				pseudo_header.source_address = (iphdr*)packetData->saddr;
 				pseudo_header.dest_address = (iphdr*)packetData->daddr;
 				pseudo_header.placeholder = 0;
@@ -439,10 +438,10 @@ size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSiz
 				break;
 		}*/
 
-		return payloadOffset + load->payloadSize;
+		return packetData->packetSize = payloadOffset + load->payloadSize;
 	}
 
-	return packetSize;
+	return packetData->packetSize;
 }
 
 // clipped from ping.c

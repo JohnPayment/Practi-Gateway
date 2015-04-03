@@ -167,8 +167,8 @@ void loadLoggingRules(const char* file);
 void unloadLoggingRules();
 void cleanRuleChain(protoRule *rule);
 
-void pushInputQueue(const unsigned char *packetData, size_t packetSize);
-void pushOutputQueue(const unsigned char *packetData, size_t packetSize);
+void pushInputQueue(const packet *packetData);
+void pushOutputQueue(const packet *packetData);
 
 void* incomingLog(void* var);
 void* outgoingLog(void* var);

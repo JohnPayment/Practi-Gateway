@@ -14,10 +14,10 @@ struct payload
 void loadPayloadRules(const char* file);
 void unloadPayloadRules();
 
-size_t IncomingReplacement(unsigned char *packetData, size_t packetSize);
-size_t OutgoingReplacement(unsigned char *packetData, size_t packetSize);
+size_t IncomingReplacement(packet *packetData);
+size_t OutgoingReplacement(packet *packetData);
 logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSize);
 
-size_t replacePayload(payload* load, unsigned char *packetData, size_t packetSize);
+size_t replacePayload(payload* load, packet *packetData);
 
 #endif

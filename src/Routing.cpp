@@ -234,7 +234,7 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	}
 
 	ret = nfq_get_payload(nfa, &packetData);
-	if (ret >= 0)
+	if (ret >= 0 && (config::logging() || config::payloadReplacement()))
 	{
 		//struct sockaddr_in source,dest;
 		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
@@ -242,20 +242,24 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 		//printf("payload_len=%d ", ret);
 		//printf("Src Adr: %s ", inet_ntoa(source.sin_addr));
 		//printf("Dst Adr: %s ", inet_ntoa(dest.sin_addr));
+		struct packet newPacket;
+		newPacket.packetSize = ret;
+		memcpy(&(newPacket.packet), packetData, ret);
 
 		if (config::logging())
 		{
-			pushInputQueue(packetData, ret);
+			pushInputQueue(&newPacket);
 		}
 		if (config::payloadReplacement())
 		{
-			ret = IncomingReplacement(packetData, ret);
+			ret = IncomingReplacement(&newPacket);
+			return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
 		}
 	}
 
 	//fputc('\n', stdout);
 
-	return nfq_set_verdict(qh, id, NF_ACCEPT, ret, packetData);
+	return nfq_set_verdict(qh, id, NF_ACCEPT, 0, NULL);
 }
 
 /*
@@ -302,15 +306,20 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
 		//dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
 
+		struct packet newPacket;
+		newPacket.packetSize = ret;
+		memcpy(&(newPacket.packet), packetData, ret);
+
 		if (config::logging())
 		{
-			pushOutputQueue(packetData, ret);
+			pushOutputQueue(&newPacket);
 		}
 		if (config::payloadReplacement())
 		{
-			ret = OutgoingReplacement(packetData, ret);
+			ret = OutgoingReplacement(&newPacket);
+			return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
 		}
 	}
 
-	return nfq_set_verdict(qh, id, NF_ACCEPT, ret, packetData);
+	return nfq_set_verdict(qh, id, NF_ACCEPT, 0, NULL);
 }

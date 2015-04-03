@@ -492,9 +492,8 @@ void unloadLogging()
 /*
 -----------------------------------------------------------------------------------------------
 -- FUNCTION: 	pushInputQueue()
--- DATE:		2015-03-10
--- PARAMETERS:	const unsigned char *packetData - The raw packet data
---				size_t packetsize - The total size of the packet data
+-- DATE:		2015-04-03
+-- PARAMETERS:	const packet *packetData - The raw packet data
 -- RETURN:		void
 -- DESIGNER:	John Payment
 -- PROGRAMMER:	John Payment
@@ -502,20 +501,16 @@ void unloadLogging()
 --				the external network.
 ------------------------------------------------------------------------------------------------
 */
-void pushInputQueue(const unsigned char *packetData, size_t packetSize)
+void pushInputQueue(const packet *packetData)
 {
-	struct packet newPacket;
-	newPacket.packetSize = packetSize;
-	memcpy(&(newPacket.packet), packetData, packetSize);
-	inPackets.push(newPacket);
+	inPackets.push(*packetData);
 }
 
 /*
 -----------------------------------------------------------------------------------------------
 -- FUNCTION: 	pushOutputQueue()
--- DATE:		2015-03-10
--- PARAMETERS:	const unsigned char *packetData - The raw packet data
---				size_t packetsize - The total size of the packet data
+-- DATE:		2015-04-03
+-- PARAMETERS:	const packet *packetData - The raw packet data
 -- RETURN:		void
 -- DESIGNER:	John Payment
 -- PROGRAMMER:	John Payment
@@ -523,12 +518,9 @@ void pushInputQueue(const unsigned char *packetData, size_t packetSize)
 --				the internal network.
 ------------------------------------------------------------------------------------------------
 */
-void pushOutputQueue(const unsigned char *packetData, size_t packetSize)
+void pushOutputQueue(const packet *packetData)
 {
-	struct packet newPacket;
-	newPacket.packetSize = packetSize;
-	memcpy(&(newPacket.packet), packetData, packetSize);
-	outPackets.push(newPacket);
+	outPackets.push(*packetData);
 }
 
 /*
@@ -1372,11 +1364,33 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 			{
 				address.sin_addr.s_addr = pckt->packet.ip.saddr;
 				logFile << "   |-Source IP          : " << inet_ntoa(address.sin_addr) << endl;
+				if(config::smartLookup())
+				{
+					smrt slog;
+					smartLog(inet_ntoa(address.sin_addr), &slog);
+					logFile << "   |--->Subnet          : " << slog.subnet << endl;
+					logFile << "   |--->Network Name    : " << slog.netname << endl;
+					logFile << "   |--->Organization    : " << slog.org << endl;
+					logFile << "   |--->Address         : " << slog.address << endl;
+					logFile << "   |                      " << slog.city << ", " << slog.provcode << ", " << slog.country << endl;
+					
+				}
 			}
 			if(rule->ip & ipFields::dst)
 			{
 				address.sin_addr.s_addr = pckt->packet.ip.daddr;
 				logFile << "   |-Destination IP     : " << inet_ntoa(address.sin_addr) << endl;
+				if(config::smartLookup())
+				{
+					smrt slog;
+					smartLog(inet_ntoa(address.sin_addr), &slog);
+					logFile << "   |--->Subnet          : " << slog.subnet << endl;
+					logFile << "   |--->Network Name    : " << slog.netname << endl;
+					logFile << "   |--->Organization    : " << slog.org << endl;
+					logFile << "   |--->Address         : " << slog.address << endl;
+					logFile << "   |                      " << slog.city << ", " << slog.provcode << ", " << slog.country << endl;
+					
+				}
 			}
 		}
 		//tcp
@@ -1385,9 +1399,21 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 			logFile << endl;
 			logFile << "TCP Header" << endl;
 			if(rule->tcp & tcpFields::src)
+			{
 				logFile << "   |-Source Port          : " << ntohs(pckt->packet.tcp.source) << endl;
+				if(config::smartLookup())
+				{
+					logFile << "   |--->Usage             : " << getPortUsage(ntohs(pckt->packet.tcp.source)) << endl;
+				}
+			}
 			if(rule->tcp & tcpFields::dst)
+			{
 				logFile << "   |-Destination Port     : " << ntohs(pckt->packet.tcp.dest) << endl;
+				if(config::smartLookup())
+				{
+					logFile << "   |--->Usage             : " << getPortUsage(ntohs(pckt->packet.tcp.dest)) << endl;
+				}
+			}
 			if(rule->tcp & tcpFields::seq)
 				logFile << "   |-Sequence Number      : " << ntohl(pckt->packet.tcp.seq) << endl;
 			if(rule->tcp & tcpFields::ack)
@@ -1416,9 +1442,21 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 			logFile << endl;
 			logFile << "UDP Header" << endl;
 			if(rule->udp & udpFields::src)
+			{
 				logFile << "   |-Source Port      : " << ntohs(udph->source) << endl;
+				if(config::smartLookup())
+				{
+					logFile << "   |--->Usage         : " << getPortUsage(ntohs(udph->source)) << endl;
+				}
+			}
 			if(rule->udp & udpFields::dst)
+			{
 				logFile << "   |-Destination Port : " << ntohs(udph->dest) << endl;
+				if(config::smartLookup())
+				{
+					logFile << "   |--->Usage         : " << getPortUsage(ntohs(udph->dest)) << endl;
+				}
+			}
 			if(rule->udp & udpFields::len)
 				logFile << "   |-UDP Length       : " << ntohs(udph->len) << endl;
 			if(rule->udp & udpFields::chksum)
@@ -1435,13 +1473,17 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 			{
 				logFile << "   |-Type     : " << (unsigned int)(icmph->type);
 			
-				if((unsigned int)(icmph->type) == 11)
+				if(config::smartLookup())
 				{
-					logFile << "  (TTL Expired)" << endl;
-				} else if((unsigned int)(icmph->type) == 0)
-				{
-					logFile << "  (ICMP Echo Reply)" << endl;
+					if((unsigned int)(icmph->type) == 11)
+					{
+						logFile << "  (TTL Expired)";
+					} else if((unsigned int)(icmph->type) == 0)
+					{
+						logFile << "  (ICMP Echo Reply)";
+					}
 				}
+				logFile << endl;
 			}
 
 			if(rule->icmp & icmpFields::code)
@@ -1471,16 +1513,22 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 				payloadOffset = sizeof(struct iphdr);
 		}
 
-		logFile << endl << "###########################PAYLOAD###########################" << endl;
+		logFile << endl << "##########################PAYLOAD###########################" << endl;
 		for(size_t i = 0; i < pckt->packetSize - payloadOffset; ++i)
 		{
-			logFile << " " << hex << setw(2) << setfill('0') << (unsigned int)pckt->packet.buffer[i];
-			if(i != 0 && i%16 == 0)
+			logFile << " " << hex << setw(2) << setfill('0') << (unsigned short)(unsigned char)(pckt->packet.buffer[i]);
+			if(i != 0 && (i+1)%16 == 0)
 			{
 				logFile << "	\"";
 				for(size_t j = i-15; j <= i; ++j)
 				{
-					logFile << pckt->packet.buffer[j];
+					if(pckt->packet.buffer[j] > 32 && pckt->packet.buffer[j] < 127)
+					{
+						logFile << pckt->packet.buffer[j];
+					} else
+					{
+						logFile << '.';
+					}
 				}
 				logFile << "\"" << endl;
 			} 
