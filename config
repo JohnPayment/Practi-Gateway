@@ -22,7 +22,7 @@ exter-ip:192.168.2.10
 ===================
  Firewall Settings
 ===================
-firewall:off
+firewall:on
 
 ==================
  Logging Settings

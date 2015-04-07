@@ -208,8 +208,6 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 {
 	int id = 0;
 	struct nfqnl_msg_packet_hdr *msgPacketHandler;
-	struct nfqnl_msg_packet_hw *hwPacketHandler;
-	//u_int32_t mark,ifi; 
 	int ret;
 	unsigned char *packetData;
 
@@ -217,47 +215,28 @@ static int incomingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 	if (msgPacketHandler) 
 	{
 		id = ntohl(msgPacketHandler->packet_id);
-		//printf("hw_protocol=0x%04x hook=%u id=%u ", ntohs(msgPacketHandler->hw_protocol), msgPacketHandler->hook, id);
-	}
-
-	hwPacketHandler = nfq_get_packet_hw(nfa);
-	if (hwPacketHandler) 
-	{
-		//int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
-
-		/*printf("hw_src_addr=");
-		for (i = 0; i < hlen-1; i++)
-		{
-			printf("%02x:", hwPacketHandler->hw_addr[i]);
-		}
-		printf("%02x ", hwPacketHandler->hw_addr[hlen-1]);*/
 	}
 
 	ret = nfq_get_payload(nfa, &packetData);
-	if (ret >= 0 && (config::logging() || config::payloadReplacement()))
+	if (ret >= 0)
 	{
-		//struct sockaddr_in source,dest;
-		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
-		//dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
-		//printf("payload_len=%d ", ret);
-		//printf("Src Adr: %s ", inet_ntoa(source.sin_addr));
-		//printf("Dst Adr: %s ", inet_ntoa(dest.sin_addr));
-		struct packet newPacket;
-		newPacket.packetSize = ret;
-		memcpy(&(newPacket.packet), packetData, ret);
+		if(config::logging() || config::payloadReplacement())
+		{
+			struct packet newPacket;
+			newPacket.packetSize = ret;
+			memcpy(&(newPacket.packet), packetData, ret);
 
-		if (config::logging())
-		{
-			pushInputQueue(&newPacket);
-		}
-		if (config::payloadReplacement())
-		{
-			ret = IncomingReplacement(&newPacket);
-			return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
+			if (config::logging())
+			{
+				pushInputQueue(&newPacket);
+			}
+			if (config::payloadReplacement())
+			{
+				ret = IncomingReplacement(&newPacket);
+				return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
+			}
 		}
 	}
-
-	//fputc('\n', stdout);
 
 	return nfq_set_verdict(qh, id, NF_ACCEPT, 0, NULL);
 }
@@ -282,8 +261,6 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 {
 	int id = 0;
 	struct nfqnl_msg_packet_hdr *msgPacketHandler;
-	struct nfqnl_msg_packet_hw *hwPacketHandler;
-	//u_int32_t mark,ifi; 
 	int ret;
 	unsigned char *packetData;
 
@@ -293,31 +270,24 @@ static int outgoingPreprocess(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, s
 		id = ntohl(msgPacketHandler->packet_id);
 	}
 
-	hwPacketHandler = nfq_get_packet_hw(nfa);
-	if (hwPacketHandler) 
-	{
-		//int i, hlen = ntohs(hwPacketHandler->hw_addrlen);
-	}
-
 	ret = nfq_get_payload(nfa, &packetData);
 	if (ret >= 0)
 	{
-		//struct sockaddr_in source,dest;
-		//source.sin_addr.s_addr = ((struct iphdr *)packetData)->saddr;
-		//dest.sin_addr.s_addr = ((struct iphdr *)packetData)->daddr;
-
-		struct packet newPacket;
-		newPacket.packetSize = ret;
-		memcpy(&(newPacket.packet), packetData, ret);
-
-		if (config::logging())
+		if(config::logging() || config::payloadReplacement())
 		{
-			pushOutputQueue(&newPacket);
-		}
-		if (config::payloadReplacement())
-		{
-			ret = OutgoingReplacement(&newPacket);
-			return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
+			struct packet newPacket;
+			newPacket.packetSize = ret;
+			memcpy(&(newPacket.packet), packetData, ret);
+
+			if (config::logging())
+			{
+				pushOutputQueue(&newPacket);
+			}
+			if (config::payloadReplacement())
+			{
+				ret = OutgoingReplacement(&newPacket);
+				return nfq_set_verdict(qh, id, NF_ACCEPT, newPacket.packetSize, (const unsigned char*)&(newPacket.packet));
+			}
 		}
 	}
 

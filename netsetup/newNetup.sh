@@ -6,7 +6,7 @@
 
 # IDEV is the device which has (workin) Internet address. 
 # WDEV is the name of the wlan-device (see iwconfig)
-IDEV=eth1
+IDEV=em1
 WDEV=wlp0s26f7u1
 
 systemctl stop firewalld.service

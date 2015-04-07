@@ -1,28 +1,25 @@
-# This filter is valid if the following condintions are met:
-# The src or dst is 192.168.0.1
-# The ttl is greater than 20
-# The TCP source port is 80
-# The TCP destination port is not 43
-#IN IP ttl >> 20
-#_  TCP SRC == 80
-#_  TCP DST != 43
-#LOG TCP SRC DST FLAGS
-
-# This filter is valid if the IP has the evil and do not fragment bits unset and the UDP source or destination port is 43.
-#OUT IP flags >= 1
-#_   UDP SRC == 43 DST == 43
-#LOG IP SRC DST FLAGS
-
-# This filter is valid if the ICMP type is less than 4.
-#BOTH ICMP type << 4
-#LOG IP SRC DST
-#LOG ICMP TYPE
-
+# This logs the src and dst ips and ports of any packet with the source IP address of 10.240.47.106
+# Unlike filter rules, logging does not constrain to a particular protocol. In other words,
+# By specifying logging rules for TCP, UDP and ICMP, it will use only the rules that are appropriate
+# For the packet being logged.
 OUT IP SRC == 10.240.47.106
 LOG IP SRC DST
 LOG TCP SRC DST
 LOG UDP SRC DST
 LOG ICMP TYPE CODE
 
-# Note that, in cases where a protocol must be set to view a variable, only packets which contain that protocol will be valid.
+# TCP is protocol #6 under IP, meaning this will log every TCP Packet
+# It also lists every possible log flag for TCP
+IN IP PROTOCOL == 6
+LOG TCP SRC DST SEQ ACK OFFSET RESERVED FLAGS WINDOW CHKSUM URG
 
+# This logs both incoming and outgoing packets
+# Similar to the above, it will only log UDP packets, since a UDP argument has been specified.
+# It also specifies every possible log flag for UDP
+BOTH UDP DST == 43
+LOG UDP SRC DST LEN CHKSUM
+
+# This specifies type twice in the same line. This will act as a boolean OR.
+# Any packet with an icmp type of 11 or 0 will be logged.
+OUT ICMP TYPE == 11 TYPE == 0
+LOG TYPE CODE CHKSUM
