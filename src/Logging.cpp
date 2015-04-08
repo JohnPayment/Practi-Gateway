@@ -653,6 +653,7 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 	protoRule* nextRule = rule;
 	while(nextRule != NULL)
 	{
+		bool valid = false;
 		if(nextRule->protocol == protocols::ip)
 		{
 			for(int i = 0; i < 4; ++i)
@@ -665,57 +666,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 							case comparators::equal:
 								if((nextRule->value[i] & 0x07) == ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::not_equal:
 								if((nextRule->value[i] & 0x07) != ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less:
 								if((nextRule->value[i] & 0x07) > ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less_equal:
 								if((nextRule->value[i] & 0x07) >= ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater:
 								if((nextRule->value[i] & 0x07) < ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater_equal:
 								if((nextRule->value[i] & 0x07) <= ((unsigned int)ntohs(packetData->ip.frag_off) >> 13))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 						}
 						break;
 					case ipFields::protocol:
@@ -724,57 +707,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 							case comparators::equal:
 								if(nextRule->value[i] == packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::not_equal:
 								if(nextRule->value[i] != packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less:
 								if(nextRule->value[i] > packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less_equal:
 								if(nextRule->value[i] >= packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater:
 								if(nextRule->value[i] < packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater_equal:
 								if(nextRule->value[i] <= packetData->ip.protocol)
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 						}
 						break;
 					case ipFields::src:
@@ -783,57 +748,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 							case comparators::equal:
 								if(ntohl(nextRule->value[i]) == ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::not_equal:
 								if(ntohl(nextRule->value[i]) != ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less:
 								if(ntohl(nextRule->value[i]) > ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less_equal:
 								if(ntohl(nextRule->value[i]) >= ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater:
 								if(ntohl(nextRule->value[i]) < ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater_equal:
 								if(ntohl(nextRule->value[i]) <= ntohl(packetData->ip.saddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 						}
 						break;
 					case ipFields::dst:
@@ -842,57 +789,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 							case comparators::equal:
 								if(ntohl(nextRule->value[i]) == ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::not_equal:
 								if(ntohl(nextRule->value[i]) != ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less:
 								if(ntohl(nextRule->value[i]) > ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::less_equal:
 								if(ntohl(nextRule->value[i]) >= ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater:
 								if(ntohl(nextRule->value[i]) < ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 							case comparators::greater_equal:
 								if(ntohl(nextRule->value[i]) <= ntohl(packetData->ip.daddr))
 								{
-									continue;
-								} else
-								{
-									return NULL;
+									valid = true;
 								}
-								break;
+								continue;
 						}
 						break;
 				}
@@ -911,57 +840,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 								case comparators::equal:
 									if(nextRule->value[i] == ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
 									if(nextRule->value[i] != ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
 									if(nextRule->value[i] > ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
 									if(nextRule->value[i] >= ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
 									if(nextRule->value[i] < ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
 									if(nextRule->value[i] <= ntohs(packetData->tcp.source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 						case tcpFields::dst:
@@ -970,57 +881,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 								case comparators::equal:
 									if(nextRule->value[i] == ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
 									if(nextRule->value[i] != ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
 									if(nextRule->value[i] > ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
 									if(nextRule->value[i] >= ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
 									if(nextRule->value[i] < ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
 									if(nextRule->value[i] <= ntohs(packetData->tcp.dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 						case tcpFields::flags:
@@ -1045,57 +938,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 								case comparators::equal:
 									if(nextRule->value[i] == ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
 									if(nextRule->value[i] != ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
 									if(nextRule->value[i] > ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
 									if(nextRule->value[i] >= ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
 									if(nextRule->value[i] < ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
 									if(nextRule->value[i] <= ntohs(((udphdr*)(&packetData->tcp))->source))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 						case udpFields::dst:
@@ -1104,57 +979,39 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 								case comparators::equal:
 									if(nextRule->value[i] == ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
 									if(nextRule->value[i] != ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
 									if(nextRule->value[i] > ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
 									if(nextRule->value[i] >= ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
 									if(nextRule->value[i] < ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
 									if(nextRule->value[i] <= ntohs(((udphdr*)(&packetData->tcp))->dest))
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 					}
@@ -1175,118 +1032,82 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 							switch(nextRule->comparason[i])
 							{
 								case comparators::equal:
-									if(nextRule->value[i] == ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] == ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
-									if(nextRule->value[i] != ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] != ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
-									if(nextRule->value[i] > ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] > ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
-									if(nextRule->value[i] >= ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] >= ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
-									if(nextRule->value[i] < ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] < ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
-									if(nextRule->value[i] <= ntohs(((icmphdr*)(&packetData->tcp))->type))
+									if(nextRule->value[i] <= ((icmphdr*)(&packetData->tcp))->type)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 						case icmpFields::code:
 							switch(nextRule->comparason[i])
 							{
 								case comparators::equal:
-									if(nextRule->value[i] == ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] == ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::not_equal:
-									if(nextRule->value[i] != ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] != ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less:
-									if(nextRule->value[i] > ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] > ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::less_equal:
-									if(nextRule->value[i] >= ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] >= ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater:
-									if(nextRule->value[i] < ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] < ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 								case comparators::greater_equal:
-									if(nextRule->value[i] <= ntohs(((icmphdr*)(&packetData->tcp))->code))
+									if(nextRule->value[i] <= ((icmphdr*)(&packetData->tcp))->code)
 									{
-										continue;
-									} else
-									{
-										return NULL;
+										valid = true;
 									}
-									break;
+									continue;
 							}
 							break;
 					}
@@ -1297,12 +1118,15 @@ logRule* checkRule(protoRule* rule, struct recv_tcp *packetData, size_t packetSi
 			}
 		}
 
-		if(nextRule->nextRule != NULL)
+		if(valid == true)
 		{
-			nextRule = nextRule->nextRule;
-		} else
-		{
-			return nextRule->logRule;
+			if(nextRule->nextRule != NULL)
+			{
+				nextRule = nextRule->nextRule;
+			} else
+			{
+				return nextRule->logRule;
+			}
 		}
 	}
 
