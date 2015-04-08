@@ -16,21 +16,21 @@ using namespace std;
 namespace config
 {
 	// User Variables
-	const string& protocols();
-	const string& firewallFilter();
+	//const string& protocols();
+	//const string& firewallFilter();
 	const string& loggingFilter();
 	const string& repoFilter();
-	const string& broadcastInterface();
-	const string& externalInterface();
+	//const string& broadcastInterface();
+	//const string& externalInterface();
 
 	// Routing Variables
-	const string& ssid();
-	bool nmode();
-	int wmode();
-	const string& password();
+	//const string& ssid();
+	//bool nmode();
+	//int wmode();
+	//const string& password();
 
 	// Firewall Variables
-	bool firewall();
+	//bool firewall();
 
 	// Logging Variables
 	bool logging();
