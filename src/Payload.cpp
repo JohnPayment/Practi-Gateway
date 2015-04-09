@@ -398,8 +398,15 @@ size_t replacePayload(payload* load, packet *packetData)
 		switch(protocol)
 		{
 			case 6: // TCP
-				payloadOffset = ipSize + tcpSize;
-				memcpy(packetData->packet.buffer, load->buffer, load->payloadSize);
+				payloadOffset = ipSize + (packetData->packet.tcp.doff * 4);
+				if(load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize > 4000)
+				{
+					// On packets with options, make sure we don't go over our size limit
+					memcpy(packetData->packet.buffer + (packetData->packet.tcp.doff * 4) - tcpSize, load->buffer, load->payloadSize - (load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize - 4000));
+				} else
+				{
+					memcpy(packetData->packet.buffer + (packetData->packet.tcp.doff * 4) - tcpSize, load->buffer, load->payloadSize);
+				}
 				break;
 			case 17: // UDP
 				payloadOffset = ipSize + udpSize;
@@ -415,6 +422,14 @@ size_t replacePayload(payload* load, packet *packetData)
 		}
 
 		packetData->packet.ip.tot_len = payloadOffset + load->payloadSize;
+		if(protocol == 6)
+		{
+			// Adjusting the total packet length if we shaved bytes off of the end of the payload
+			if(load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize > 4000)
+			{
+				packetData->packet.ip.tot_len -= (load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize - 4000);
+			}
+		}
 		packetData->packet.ip.check = 0;
 		packetData->packet.ip.check = in_cksum((unsigned short *)&(packetData->packet), 20);
 
@@ -438,7 +453,12 @@ size_t replacePayload(payload* load, packet *packetData)
 				break;
 		}*/
 
-		return packetData->packetSize = payloadOffset + load->payloadSize;
+		packetData->packetSize = payloadOffset + load->payloadSize;
+		if(packetData->packetSize > 4000)
+		{
+			packetData->packetSize = 4000;
+		}
+		return packetData->packetSize;
 	}
 
 	return packetData->packetSize;
