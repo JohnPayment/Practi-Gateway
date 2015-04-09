@@ -2,24 +2,25 @@
 # Unlike filter rules, logging does not constrain to a particular protocol. In other words,
 # By specifying logging rules for TCP, UDP and ICMP, it will use only the rules that are appropriate
 # For the packet being logged.
-OUT IP SRC == 10.240.47.106
-LOG IP SRC DST
-LOG TCP SRC DST
-LOG UDP SRC DST
-LOG ICMP TYPE CODE
+#OUT IP SRC == 10.240.47.106
+#LOG IP SRC DST
+#LOG TCP SRC DST
+#LOG UDP SRC DST
+#LOG ICMP TYPE CODE
 
 # TCP is protocol #6 under IP, meaning this will log every TCP Packet
 # It also lists every possible log flag for TCP
-IN IP PROTOCOL == 6
-LOG TCP SRC DST SEQ ACK OFFSET RESERVED FLAGS WINDOW CHKSUM URG
+#IN IP PROTOCOL == 6
+#LOG TCP SRC DST SEQ ACK OFFSET RESERVED FLAGS WINDOW CHKSUM URG
 
 # This logs both incoming and outgoing packets
 # Similar to the above, it will only log UDP packets, since a UDP argument has been specified.
 # It also specifies every possible log flag for UDP
-BOTH UDP DST == 43
-LOG UDP SRC DST LEN CHKSUM
+#BOTH UDP DST == 43
+#LOG UDP SRC DST LEN CHKSUM
 
 # This specifies type twice in the same line. This will act as a boolean OR.
 # Any packet with an icmp type of 11 or 0 will be logged.
-OUT ICMP TYPE == 11 TYPE == 0
-LOG TYPE CODE CHKSUM
+OUT ICMP TYPE == 11 TYPE == 0 TYPE == 8
+LOG ICMP TYPE CODE CHKSUM
+

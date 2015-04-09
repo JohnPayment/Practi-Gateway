@@ -11,6 +11,8 @@ vector<protoRule> outRules;
 
 queue<packet> inPackets;
 queue<packet> outPackets;
+pthread_mutex_t inPackMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t outPackMut = PTHREAD_MUTEX_INITIALIZER;
 
 /*
 -----------------------------------------------------------------------------------------------
@@ -503,7 +505,9 @@ void unloadLogging()
 */
 void pushInputQueue(const packet *packetData)
 {
+	pthread_mutex_lock(&inPackMut);
 	inPackets.push(*packetData);
+	pthread_mutex_unlock(&inPackMut);
 }
 
 /*
@@ -520,7 +524,9 @@ void pushInputQueue(const packet *packetData)
 */
 void pushOutputQueue(const packet *packetData)
 {
+	pthread_mutex_lock(&outPackMut);
 	outPackets.push(*packetData);
+	pthread_mutex_unlock(&outPackMut);
 }
 
 /*
@@ -543,6 +549,9 @@ void* incomingLog(void* var)
 	{
 		if(!inPackets.empty())
 		{
+			pthread_mutex_lock(&inPackMut);
+			// Forcing the process to wait for a potentially new packet to be fully loaded into inPackets
+			pthread_mutex_unlock(&inPackMut);
 			memset(&cRule, 0, sizeof(cRule));
 			for(size_t i = 0; i < inRules.size(); ++i)
 			{
@@ -598,6 +607,9 @@ void* outgoingLog(void* var)
 	{
 		if(!outPackets.empty())
 		{
+			pthread_mutex_lock(&outPackMut);
+			// Forcing the process to wait for a potentially new packet to be fully loaded into outPackets
+			pthread_mutex_unlock(&outPackMut);
 			memset(&cRule, 0, sizeof(cRule));
 			for(size_t i = 0; i < outRules.size(); ++i)
 			{
