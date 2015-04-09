@@ -17,4 +17,9 @@ then
 	yum install dnsmasq -y
 fi
 
+if [ ! -x "$(command -v g++ 2>&1)" ]
+then
+	yum install gcc-c++ -y
+fi
+
 yum install libnfnetlink -y
