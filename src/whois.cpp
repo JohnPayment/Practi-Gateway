@@ -21,7 +21,7 @@ void writeFile(const char* ip, const string* response);
 string getWhois(char* query)
 {
 	string response;
-	string src = "./filters/whois/";
+	string src(config::whoisDirectory());
 	src.append(query);
 	ifstream whoisLog(src.c_str(), ios_base::in);
 
@@ -249,7 +249,7 @@ void smartLog(char* ip, smrt* log)
 */
 string getPortUsage(unsigned int port)
 {
-	ifstream log("./filters/ports");
+	ifstream log(config::portFile().c_str());
 	string data;
 	while(getline(log, data))
 	{
@@ -277,7 +277,7 @@ string getPortUsage(unsigned int port)
 */
 void writeFile(const char* ip, const string* response)
 {
-	string dest = "./filters/whois/";
+	string dest(config::whoisDirectory());
 	dest.append(ip);
 	ofstream config(dest.c_str(), ios_base::out);
 	config << *response;

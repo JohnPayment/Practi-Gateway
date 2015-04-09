@@ -36,6 +36,10 @@ namespace config
 	bool logging();
 	bool smartLookup();
 
+	const string& logDirectory();
+	const string& whoisDirectory();
+	const string& portFile();
+
 	// Payload Replacement Variables
 	bool payloadReplacement();
 }

@@ -1,34 +1,17 @@
 ===============
  User Settings
 ===============
-protocols:./protocols
-firewall-filter:./filters/firewall
 logging-filter:./filters/logger
 repo-filter:./filters/replacer
 
 ==================
- Routing Settings
-==================
-broadcastInterface:wlp0s26f7u1
-externalInterface:em1
-ssid:testgateway
-nmode:infrastructure
-wpa:off
-password:password
-
-inter-ip:10.240.47.0
-exter-ip:192.168.2.10
-
-===================
- Firewall Settings
-===================
-firewall:on
-
-==================
  Logging Settings
 ==================
-logging:off
+logging:on
 smartlookup:off
+
+whois-dir:./filters/whois/
+ports:./filters/ports
 
 =====================
  Payload Replacement

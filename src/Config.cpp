@@ -22,6 +22,10 @@ string _repoFilter;
 bool _logging = false;
 bool _smartLookup = false;
 
+string _logDirectory;
+string _whoisDirectory;
+string _portFile;
+
 // Payload Replacement Variables
 bool _payloadReplacement = false;
 
@@ -45,6 +49,10 @@ const string& config::repoFilter() {return _repoFilter;}
 // Logging Variables
 bool config::logging() {return _logging;}
 bool config::smartLookup() {return _smartLookup;}
+
+const string& config::logDirectory() {return _logDirectory;}
+const string& config::whoisDirectory() {return _whoisDirectory;}
+const string& config::portFile() {return _portFile;}
 
 // Payload Replacement Variables
 bool config::payloadReplacement() {return _payloadReplacement;}
@@ -158,6 +166,18 @@ void getConfig(const char* file)
 				{
 					_smartLookup = false;
 				}
+			} else if(data.find("log-dir:") != string::npos)
+			{
+				_logDirectory.clear();
+				_logDirectory.append(data.substr(8));
+			} else if(data.find("whois-dir:") != string::npos)
+			{
+				_whoisDirectory.clear();
+				_whoisDirectory.append(data.substr(10));
+			} else if(data.find("ports:") != string::npos)
+			{
+				_portFile.clear();
+				_portFile.append(data.substr(6));
 			} else if(data.find("payloadreplacement:") != string::npos)
 			{
 				if(data.find("on") != string::npos)
@@ -218,6 +238,9 @@ void makeConfig()
 	config << "==================" << endl;
 	config << "logging:off" << endl;
 	config << "smartlookup:off" << endl << endl;
+
+	config << "whois-dir:./filters/whois/" << endl;
+	config << "ports:./filters/ports" << endl << endl;
 
 	config << "=====================" << endl;
 	config << " Payload Replacement " << endl;
