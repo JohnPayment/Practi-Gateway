@@ -1,3 +1,4 @@
 IN TCP SRC == 80
-REP ./filters/logger
+REP ./filters/blank
+
 
