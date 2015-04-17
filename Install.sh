@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ ! -x "$(command -v yum 2>&1)" ]
+then
+	printf "You do not appear to have yum installed.\n"
+	printf "This install script uses yum extensively and will not run without it.\n"
+	exit 1
+fi
+
 if [ ! -x "$(command -v ifconfig 2>&1)" ]
 then
 	printf "You do not appear to have ifconfig installed.\n"
