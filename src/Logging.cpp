@@ -1188,7 +1188,7 @@ void logPacket(logRule* rule, struct packet* pckt, const char* fileName)
 				logFile << "   |-Dont Fragment Flag : " << ((flag & 0x02) == 0x02) << endl;
 				logFile << "   |-More Fragment Flag : " << ((flag & 0x01) == 0x01) << endl;
 			}
-			if(rule->ip & ipFields::ttl)
+			if(rule->ip & ipFields::frag)
 				logFile << "   |-Fragment offset    : " << (ntohs(pckt->packet.ip.frag_off) & 0x1FFF) << endl;
 			if(rule->ip & ipFields::ttl)
 				logFile << "   |-TTL                : " << (unsigned int)pckt->packet.ip.ttl << endl;
