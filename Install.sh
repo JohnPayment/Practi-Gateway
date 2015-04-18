@@ -29,4 +29,4 @@ then
 	yum install gcc-c++ -y
 fi
 
-yum install libnfnetlink -y
+yum install libnetfilter_queue libnetfilter_queue-devel libnfnetlink libnfnetlink-devel -y
