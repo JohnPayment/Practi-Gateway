@@ -38,6 +38,20 @@ run properly.
 	|--> Used to access packets passed from iptables in userspace
 
 ==============
+   RUNNING
+==============
+To build the project, use the make file found in /src. If you don't see Practi-Gateway.exe, you
+will probably need to do this.
+
+Practi-Gateway can be run either by using run.sh script, which runs each component of the suite
+at once, or by running each component individually. If at first it doesn't work, try to disable
+the network manager.
+
+In Fedora 20, the network manager can be temporarily disabled using the following command:
+
+# systemctl stop NetworkManager.service 
+
+==============
  CONFIG FILES
 ==============
 Multiple-File Values:
