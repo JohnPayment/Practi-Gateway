@@ -8,7 +8,7 @@ IDEV=em1
 WDEV=wlp0s26f7u1
 
 # The IP for this machine on the new, internal network
-intIP=10.240.47.1/24
+intIP=192.168.10.1/24
 
 # Default Access mode for the firewall.
 # DROP will enable the firewall with inclusive rules, while ACCEPT will disable it
@@ -95,4 +95,5 @@ fi
 #service NetworkManager stop
 
 dnsmasq -C ./dnsmasq.conf
+sleep 2
 hostapd -B ./hostapd.conf
