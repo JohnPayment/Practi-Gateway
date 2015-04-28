@@ -421,13 +421,13 @@ size_t replacePayload(payload* load, packet *packetData)
 				memcpy(&(packetData->packet.tcp), load->buffer, load->payloadSize);
 		}
 
-		packetData->packet.ip.tot_len = payloadOffset + load->payloadSize;
+		packetData->packet.ip.tot_len = htons(payloadOffset + load->payloadSize);
 		if(protocol == 6)
 		{
 			// Adjusting the total packet length if we shaved bytes off of the end of the payload
 			if(load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize > 4000)
 			{
-				packetData->packet.ip.tot_len -= (load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize - 4000);
+				packetData->packet.ip.tot_len -= htons(load->payloadSize + (packetData->packet.tcp.doff * 4) - tcpSize - 4000);
 			}
 		}
 		packetData->packet.ip.check = 0;
